@@ -59,7 +59,6 @@ const params = {
 			publicFields: props['x-swagger-protected-public-fields'],
 			skipFields: props['x-swagger-skip-fields'],
 		};
-		console.info('req.userData ', req?.userData);
 		if (props['x-swagger-protected']) {
 			if (!req.userData) {
 				return res.end('Invalid access token');

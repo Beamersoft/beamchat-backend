@@ -1,3 +1,5 @@
+const { ObjectId } = require('mongodb');
+
 const chatsController = (upInstance) => {
 	const {
 		services,
@@ -19,6 +21,12 @@ const chatsController = (upInstance) => {
 				participants: { $elemMatch: { id: exists._id, pubKey: { $ne: null } } },
 			});
 
+			console.info('chats ', chats);
+
+			if (chats.length === 0) {
+				return res.json({ chats, users: [] });
+			}
+
 			const participantIds = chats.reduce((acc, chat) => {
 				chat.participants.forEach((participant) => {
 					if (acc.indexOf(participant.id) === -1) acc.push(participant.id.toString());
@@ -26,13 +34,19 @@ const chatsController = (upInstance) => {
 				return acc;
 			}, []);
 
+			console.info('participantIds ', participantIds);
+
 			const participantObjectId = participantIds.map((id) => new ObjectId(id));
+
+			console.info('participantObjectId ', participantObjectId);
 
 			const userDetails = await services.find('/users', {
 				_id: { $in: participantObjectId },
 			}, {
 				projection: { firstName: 1, lastName: 1 },
 			});
+
+			console.info('userDetails ', userDetails);
 
 			const users = {};
 
