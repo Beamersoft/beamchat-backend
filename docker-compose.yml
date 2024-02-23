@@ -1,0 +1,23 @@
+version: "3"
+services:
+  beamchat:
+    build: .
+    ports:
+      - "3500:3500"
+    links:
+      - mongodb
+    volumes:
+      - .:/home/beamchat
+    environment:
+      - NODE_ENV=dev
+      - DEBUG=beamchat*
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_NAME=uptesting
+      - BASEPATH=/services
+      - HOST=localhost
+      - PORT=3500
+      - NAME=beamchat
+  mongodb:
+    image: mongo
+    ports:
+      - "4000:27017"

@@ -1,0 +1,32 @@
+{
+  "name": "beamchatbackend",
+  "version": "1.0.0",
+  "description": "Beamchat backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Beamersoft/BeamchatBackendV2"
+  },
+  "keywords": [
+    "Universal",
+    "Pattern",
+    "microservices",
+    "mongodb",
+    "swagger",
+    "nodejs"
+  ],
+  "author": "Carlos Martin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Beamersoft/BeamchatBackendV2/issues"
+  },
+  "homepage": "https://github.com/Beamersoft/BeamchatBackendV2#readme",
+  "dependencies": {
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "universal-pattern": "^2.0.4"
+  }
+}
