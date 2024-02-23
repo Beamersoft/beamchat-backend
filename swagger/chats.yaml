@@ -1,0 +1,80 @@
+paths:
+  /chats:
+    get:
+      tags:
+        - chats
+      summary: chats list
+      x-swagger-router-controller: universal.search
+      x-swagger-skip-fields:
+        - _n
+        - _v
+        - _retry
+        - added
+        - password
+        - salt
+      x-swagger-public-field:
+        - firstName
+        - lastName
+      parameters:
+        - $ref: '#/parameters/q'
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/sorting'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/fields'
+
+      responses:
+        '200':
+          description: chats list
+          schema:
+            $ref: '#/definitions/chats'
+
+    delete:
+      tags:
+        - chats
+      summary: delete chat
+      x-swagger-router-controller: universal.remove
+      parameters:
+        - name: _id
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          description: deleted chat
+          schema:
+            $ref: '#/definitions/chat'
+
+  /chats/all:
+    post:
+      x-swagger-protected: true
+      x-swagger-protected-level: 30
+      x-swagger-router-controller: Chats.all
+      tags:
+        - chats
+      description: Get all chats for this user
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description: chat Profile.
+          schema:
+            $ref: '#/definitions/chat'
+
+definitions:
+  chatInput:
+    type: object
+    properties:
+      isPrivate:
+        type: boolean
+        required: true
+      pubKey:
+        type: string
+        required: true
+      invitedEmail:
+        type: string
+        format: email
+        required: true
+        x-swagger-unique: true

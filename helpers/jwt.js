@@ -4,7 +4,7 @@ const jwtsecret = process.env.JWT_SECRET || 'NoSecret';
 
 const getDataByToken = async (token) => {
 	const authText = token.split(' ');
-	if (authText[0].trim().toUpperCase() !== 'BEARER:') return null;
+	if (authText[0].trim().toUpperCase() !== 'BEARER') return null;
 	const ntoken = authText[1].trim();
 	const verified = await jwt.verify(ntoken, jwtsecret);
 	return verified;

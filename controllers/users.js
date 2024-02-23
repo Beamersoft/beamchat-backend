@@ -11,7 +11,7 @@ const usersController = (upInstance) => {
 	upInstance.registerController('Users.login', async (req, res) => {
 		const Credentials = req.swagger.params.modeldata.value;
 		const email = Credentials.email.toLowerCase().trim();
-		const password = Credentials.password;
+		const { password } = Credentials;
 
 		try {
 			const exists = await services.findOne('/users', {

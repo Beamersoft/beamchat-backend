@@ -21,7 +21,6 @@ preMWS.push(
 preMWS.push(headers);
 preMWS.push(decodejwt);
 
-
 const params = {
 	swagger: {
 		baseDoc: process.env.BASEPATH,
@@ -53,7 +52,41 @@ const params = {
 	},
 	cors: true,
 	production: false,
-	routeController: (req, res, next) => next(),
+	routeController: (req, res, next, props) => {
+		req.endpoint = {
+			protected: props['x-swagger-protected'],
+			protectedLevel: props['x-swagger-protected-level'],
+			publicFields: props['x-swagger-protected-public-fields'],
+			skipFields: props['x-swagger-skip-fields'],
+		};
+		console.info('req.userData ', req?.userData);
+		if (props['x-swagger-protected']) {
+			if (!req.userData) {
+				return res.end('Invalid access token');
+			}
+
+			if (req.userData.level < parseInt(props['x-swagger-protected-level'], 10)) {
+				return res.end('Invalid userLevel');
+			}
+		}
+
+		if (props['x-swagger-update-protected-level']) {
+			let dale = true;
+			const protectedProps = props['x-swagger-update-protected-level'];
+			if (req.swagger.params?.modeldata?.value) {
+				Object.keys(req.swagger.params.modeldata.value).forEach((key) => {
+					if (protectedProps[key]) {
+						if (req.userData.level < protectedProps[key]) {
+							dale = false;
+						}
+					}
+				});
+			}
+			if (!dale) return res.status(500).end('Invalid user level');
+		}
+
+		return next();
+	},
 	port: process.env.PORT,
 	database: {
 		uri: process.env.MONGODB_URL,
@@ -77,4 +110,3 @@ async function init() {
 }
 
 init();
-
