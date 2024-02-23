@@ -12,7 +12,7 @@ services:
       - NODE_ENV=dev
       - DEBUG=beamchat*
       - MONGODB_URL=mongodb://mongodb:27017
-      - MONGODB_NAME=uptesting
+      - MONGODB_NAME=beamchatdb
       - BASEPATH=/services
       - HOST=localhost
       - PORT=3500
@@ -20,4 +20,4 @@ services:
   mongodb:
     image: mongo
     ports:
-      - "4000:27017"
+      - "4007:27017"
