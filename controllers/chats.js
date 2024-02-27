@@ -79,8 +79,6 @@ const chatsController = (upInstance) => {
 				pubKey,
 			} = AcceptChat;
 
-			console.info('AcceptChat ', AcceptChat);
-
 			const chat = await services.findOne('/chats', {
 				participants: {
 					$elemMatch: {
@@ -88,8 +86,6 @@ const chatsController = (upInstance) => {
 					},
 				},
 			});
-
-			console.info('chat ', chat);
 
 			if (!chat) return res.status(400).send('Chat not found');
 
@@ -103,7 +99,7 @@ const chatsController = (upInstance) => {
 					'participants.$[elem].pubKey': pubKey,
 				},
 				{
-					updated: false,
+					updated: true,
 					set: true,
 				},
 				{
@@ -111,16 +107,20 @@ const chatsController = (upInstance) => {
 				},
 			);
 
-			console.info('updated');
-
-			await services.updateByFilter('/notifications', {
-				chatId,
-			}, {
-				$set: {
+			await services.updateByFilter(
+				'/notifications',
+				{
+					chatId,
+				},
+				{
 					status: 'accepted',
 					answeredAt: new Date(),
 				},
-			});
+				{
+					updated: true,
+					set: true,
+				},
+			);
 
 			return res.json({ chatId });
 		} catch (err) {

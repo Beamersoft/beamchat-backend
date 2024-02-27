@@ -17,6 +17,24 @@ services:
       - HOST=localhost
       - PORT=3500
       - NAME=beamchat
+  beamchatsocket:
+    build: ../BeamchatSocket/
+    ports:
+      - "3501:3501"
+    links:
+      - mongodb
+    volumes:
+      - ../BeamchatSocket:/home/beamchatsocket
+    environment:
+      - NODE_ENV=dev
+      - DEBUG=beamchat*
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_NAME=beamchatdb
+      - BASEPATH=/services
+      - HOST=localhost
+      - PORT=3501
+      - NAME=beamchatsocket
+      - BEAMCHAT_SIGN=secr4tSignJWT7B3am4rCh2t
   mongodb:
     image: mongo
     ports:

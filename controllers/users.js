@@ -27,7 +27,21 @@ const usersController = (upInstance) => {
 			}
 
 			const jwt = signJWT(exists);
+
+			const user = { ...exists };
+
+			delete user.password;
+			delete user._instanceId;
+			delete user.active;
+			delete user.level;
+			delete user.salt;
+			delete user._v;
+			delete user._n;
+			delete user._retry;
+			delete user.added;
+
 			return res.json({
+				...user,
 				jwt,
 			});
 		} catch (err) {

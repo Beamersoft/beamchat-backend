@@ -6,7 +6,7 @@ paths:
       tags:
         - notifications
       summary: notifications list
-      x-swagger-router-controller: universal.search
+      x-swagger-router-controller: Notifications.all
       x-swagger-skip-fields:
         - _n
         - _v
@@ -22,11 +22,6 @@ paths:
           in: header
           required: true
           type: string
-        - $ref: '#/parameters/q'
-        - $ref: '#/parameters/page'
-        - $ref: '#/parameters/sorting'
-        - $ref: '#/parameters/limit'
-        - $ref: '#/parameters/fields'
 
       responses:
         '200':

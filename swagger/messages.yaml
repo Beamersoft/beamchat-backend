@@ -1,32 +1,23 @@
 paths:
   /messages:
-    get:
+    post:
       x-swagger-protected: true
       x-swagger-protected-level: 30
       tags:
         - messages
       summary: messages list
-      x-swagger-router-controller: universal.search
-      x-swagger-skip-fields:
-        - _n
-        - _v
-        - _retry
-        - added
-        - password
-        - salt
-      x-swagger-public-field:
-        - firstName
-        - lastName
+      x-swagger-router-controller: Messages.get
       parameters:
         - name: authorization
           in: header
           required: true
           type: string
-        - $ref: '#/parameters/q'
-        - $ref: '#/parameters/page'
-        - $ref: '#/parameters/sorting'
-        - $ref: '#/parameters/limit'
-        - $ref: '#/parameters/fields'
+        - in: body
+          name: modeldata
+          description: An object containing the required data.
+          required: true
+          schema:
+            $ref: '#/definitions/MessagesChat'
 
       responses:
         '200':
@@ -79,5 +70,18 @@ definitions:
         type: string
         required: true
       iv:
+        type: string
+        required: true
+
+  MessagesChat:
+    type: object
+    properties:
+      chatId:
+        type: string
+        required: true
+      skip:
+        type: string
+        required: true
+      limit:
         type: string
         required: true
