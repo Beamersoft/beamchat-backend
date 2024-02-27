@@ -63,8 +63,83 @@ paths:
           schema:
             $ref: '#/definitions/chat'
 
+  /chats/accept:
+    post:
+      x-swagger-protected: true
+      x-swagger-protected-level: 30
+      x-swagger-router-controller: Chats.accept
+      tags:
+        - chats
+      description: Accepts a chat invite
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          type: string
+        - in: body
+          name: modeldata
+          description: An object containing the required data.
+          required: true
+          schema:
+            $ref: '#/definitions/AcceptChat'
+      responses:
+        '200':
+          description: chat Profile.
+          schema:
+            $ref: '#/definitions/chat'
+
+  /chats/create:
+    post:
+      x-swagger-protected: true
+      x-swagger-protected-level: 30
+      x-swagger-router-controller: Chats.create
+      tags:
+        - chats
+      description: Creates a new chat
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          type: string
+        - in: body
+          name: modeldata
+          description: An object containing the required data.
+          required: true
+          schema:
+            $ref: '#/definitions/CreateChat'
+      responses:
+        '200':
+          description: chat Profile.
+          schema:
+            $ref: '#/definitions/chat'
+
 definitions:
   chatInput:
+    type: object
+    properties:
+      isPrivate:
+        type: boolean
+        required: true
+      pubKey:
+        type: string
+        required: true
+      invitedEmail:
+        type: string
+        format: email
+        required: true
+        x-swagger-unique: true
+
+  AcceptChat:
+    type: object
+    properties:
+      chatId:
+        type: string
+        required: true
+      pubKey:
+        type: string
+        required: true
+
+  CreateChat:
     type: object
     properties:
       isPrivate:

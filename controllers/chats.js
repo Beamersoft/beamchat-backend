@@ -1,4 +1,4 @@
-const { ObjectId } = require('mongodb');
+const { v4 } = require('uuid');
 
 const chatsController = (upInstance) => {
 	const {
@@ -21,43 +21,173 @@ const chatsController = (upInstance) => {
 				participants: { $elemMatch: { id: exists._id, pubKey: { $ne: null } } },
 			});
 
-			console.info('chats ', chats);
-
 			if (chats.length === 0) {
 				return res.json({ chats, users: [] });
 			}
 
 			const participantIds = chats.reduce((acc, chat) => {
 				chat.participants.forEach((participant) => {
-					if (acc.indexOf(participant.id) === -1) acc.push(participant.id.toString());
+					if (acc.indexOf(participant.id) === -1 &&
+					participant.id.toString() !== exists._id.toString()) {
+						acc.push(participant.id.toString());
+					}
 				});
 				return acc;
 			}, []);
 
-			console.info('participantIds ', participantIds);
+			const promises = [];
+			// eslint-disable-next-line no-restricted-syntax
+			for (const participant of participantIds) {
+				promises.push(services.findOne('/users', {
+					_id: participant,
+				}, {
+					projection: { firstName: 1, lastName: 1 },
+				}));
+			}
 
-			const participantObjectId = participantIds.map((id) => new ObjectId(id));
-
-			console.info('participantObjectId ', participantObjectId);
-
-			const userDetails = await services.find('/users', {
-				_id: { $in: participantObjectId },
-			}, {
-				projection: { firstName: 1, lastName: 1 },
-			});
-
-			console.info('userDetails ', userDetails);
+			const promisesRes = await Promise.all(promises);
 
 			const users = {};
 
 			// eslint-disable-next-line no-restricted-syntax
-			for (const u of userDetails) {
-				if (exists._id.toString() !== u._id.toString()) users[u._id] = u;
+			for (const u of promisesRes) {
+				users[u._id.toString()] = u;
 			}
 
 			return res.json({ chats, users });
 		} catch (err) {
-			return res.status(400).send(err.toString());
+			return res.status(401).send(err.toString());
+		}
+	});
+
+	upInstance.registerController('Chats.accept', async (req, res) => {
+		try {
+			const { email } = req.userData;
+
+			const exists = await services.findOne('/users', {
+				email,
+			});
+
+			if (!exists) {
+				return res.status(401).end('User not found');
+			}
+
+			const AcceptChat = req.swagger.params.modeldata.value;
+
+			const {
+				chatId,
+				pubKey,
+			} = AcceptChat;
+
+			console.info('AcceptChat ', AcceptChat);
+
+			const chat = await services.findOne('/chats', {
+				participants: {
+					$elemMatch: {
+						id: exists._id,
+					},
+				},
+			});
+
+			console.info('chat ', chat);
+
+			if (!chat) return res.status(400).send('Chat not found');
+
+			await services.updateByFilter(
+				'chats',
+				{
+					chatId,
+					'participants.id': exists._id,
+				},
+				{
+					'participants.$[elem].pubKey': pubKey,
+				},
+				{
+					updated: false,
+					set: true,
+				},
+				{
+					arrayFilters: [{ 'elem.id': exists._id, 'elem.pubKey': null }],
+				},
+			);
+
+			console.info('updated');
+
+			await services.updateByFilter('/notifications', {
+				chatId,
+			}, {
+				$set: {
+					status: 'accepted',
+					answeredAt: new Date(),
+				},
+			});
+
+			return res.json({ chatId });
+		} catch (err) {
+			return res.status(401).send(err.toString());
+		}
+	});
+
+	upInstance.registerController('Chats.create', async (req, res) => {
+		try {
+			const { email } = req.userData;
+
+			const exists = await services.findOne('/users', {
+				email,
+			});
+
+			if (!exists) {
+				return res.status(401).end('User not found');
+			}
+
+			const CreateChat = req.swagger.params.modeldata.value;
+
+			const {
+				isPrivate,
+				pubKey,
+				invitedEmail,
+			} = CreateChat;
+
+			if (email === invitedEmail) return res.status(400).send('Cannot invite yourself to a chat');
+
+			const invitedUser = await services.findOne('/users', { email: invitedEmail });
+
+			if (!invitedUser) return res.status(400).send('Invited user not found');
+
+			const chatId = v4();
+
+			const newChat = {
+				chatId,
+				participants: [{
+					id: exists._id,
+					pubKey,
+				}, {
+					id: invitedUser._id,
+					pubKey: null,
+				}],
+				isPrivate: isPrivate || true,
+				createdAt: new Date(),
+			};
+
+			await services.insert('/chats', newChat);
+
+			const newNotification = {
+				senderId: exists._id,
+				receiverId: invitedUser._id,
+				chatId,
+				status: 'pending',
+				type: 'NOTIFICATION_CHAT_INVITE',
+				sentAt: new Date(),
+				answeredAt: null,
+			};
+
+			await services.insert('/notifications', newNotification);
+
+			// TODO: Send push notification to invitedUser
+
+			return res.json({ chatId });
+		} catch (err) {
+			return res.status(401).send(err.toString());
 		}
 	});
 };

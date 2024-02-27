@@ -27,8 +27,9 @@
   "dependencies": {
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.3.0",
     "universal-pattern": "^2.0.4",
-    "mongodb": "^6.3.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
