@@ -93,7 +93,7 @@ const params = {
 	},
 	routes,
 	enabledStats: true, // enabled stats http://localhost:3500/stats
-	cache: true, // active cache
+	cache: false, // active cache
 };
 
 async function init() {

@@ -1,22 +1,12 @@
 paths:
   /notifications:
-    get:
+    post:
       x-swagger-protected: true
       x-swagger-protected-level: 30
       tags:
         - notifications
       summary: notifications list
       x-swagger-router-controller: Notifications.all
-      x-swagger-skip-fields:
-        - _n
-        - _v
-        - _retry
-        - added
-        - password
-        - salt
-      x-swagger-public-field:
-        - firstName
-        - lastName
       parameters:
         - name: authorization
           in: header
