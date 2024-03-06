@@ -45,10 +45,10 @@ npm install
 sudo docker compose up -d
 ```
 
-Be sure to have this project at the same directory level than **beamchat-backend** like:
+Be sure to have this project at the same directory level than **beamchat-socket** like:
 
-  - /your-projects-folder/beamchat-backend
   - /your-projects-folder/beamchat-socket
+  - /your-projects-folder/beamchat-backend
 
 You will see three containers running:
 
